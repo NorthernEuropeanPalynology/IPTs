@@ -1,0 +1,298 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ccc;
+  height: 40px;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+header #file-info {
+  color: black;
+}
+
+header .header-buttons button {
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #888;
+  background: #eee;
+  cursor: pointer;
+}
+
+/* Main layout */
+#main-container {
+  display: flex;
+  height: calc(100% - 35px);
+  background: #ddd; /* so the padding shows as grey around viewer */
+  box-sizing: border-box;
+  padding: 30px; /* padding around the whole content area */
+}
+
+/* Viewer */
+#viewer {
+  flex: 1;
+  background: black;
+  margin-right: 30px;   /* space between viewer and sidebar */
+  border: 1px solid #aaa;
+  border-radius: 6px;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 35%;    /* wider sidebar */
+  border: 1px solid #aaa;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+}
+
+/* Tabs */
+#tabs {
+  display: flex;
+  border-bottom: 1px solid #aaa;
+}
+
+/* Make segmentation div into a grid */
+#segmentation.active {
+  display: grid;
+  grid-template-rows: 5%, 70% 20% min-content;;  /* 3 rows */
+  gap: 1rem;                           /* space between rows */
+  padding: 1rem;
+  border: 1px solid #ccc;              /* optional */
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+  cursor: pointer;
+  background: #eee;
+  border-right: 1px solid #aaa;
+}
+
+.tab.active {
+  background: white;
+  font-weight: bold;
+}
+
+.tab-content {
+  display: none;
+  padding: 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Row 1: histograms in a single row */
+.histograms {
+  display: grid;
+  min-height: 0; 
+  grid-template-rows: 1fr 1fr 1fr;  /* 3 equal rows */
+}
+
+
+.settings {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+
+.form-row label{
+  display: flex;
+  width: 40%;
+}
+
+.form-row input{
+  width: 100px;
+}
+
+.form-row{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+/* Row 3: button at bottom */
+.actions {
+  display: flex;
+  min-height: 25px; 
+  gap: 15px;
+}
+
+/* Results table */
+#resultsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+#resultsTable th, #resultsTable td {
+  border: 1px solid #aaa;
+  padding: 4px;
+  text-align: center;
+}
+
+/* Loading overlay */
+#loadingOverlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
+
+#morphology.active{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loading-box {
+  background: white;
+  width: 300px;
+  padding: 20px;
+  border-radius: 6px;
+  margin: 15% auto;
+  text-align: center;
+}
+
+.upload-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.upload-btn:hover {
+    background: #0056b3;
+}
+.load-from-cache-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #fff;
+    color: rgb(46, 45, 45);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.load-from-cache-btn:hover {
+    background: #d4d4d4;
+}
+
+  /* Loading overlay */
+#loadingOverlay {
+    display: none; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+}
+.loading-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* ---------- HSV panels ---------- */
+#hue-hist, #sat-hist, #val-hist {
+  position: relative;
+  height: 80px;            /* matches your mockup height */
+  margin: 10px 15px 10px 15px;    /* spacing like PPT */
+  border: 1px solid #999;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Backgrounds visible through Plotly (we make plots transparent) */
+#hue-hist {
+  background: linear-gradient(
+    to right,
+    hsl(0,100%,85%),
+    hsl(30,100%,85%),
+    hsl(60,100%,85%),
+    hsl(90,100%,85%),
+    hsl(120,100%,85%),
+    hsl(150,100%,85%),
+    hsl(180,100%,85%),
+    hsl(210,100%,85%),
+    hsl(240,100%,85%),
+    hsl(270,100%,85%),
+    hsl(300,100%,85%),
+    hsl(330,100%,85%),
+    hsl(360,100%,85%)
+  );
+}
+
+.hist-label{
+  height: 20px;
+}
+
+#sat-hist { background: linear-gradient(to right, #fff, #000); }
+#val-hist { background: linear-gradient(to right, #000, #fff); }
+
+/* Red slider labels under the axis (like your PPT 0 … 360 and 0 … 1) */
+.hsv-labels {
+  position: absolute;
+  left: 8px; right: 8px; bottom: 2px;
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: #d00; font-weight: 600;
+  pointer-events: none;
+}
+.hsv-container {
+  position: relative;
+  height: 120px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.hsv-plot {
+  position: absolute;
+  inset: 0;
+}
+
+.range-slider {
+  position: absolute;
+  inset: 0;
+}
+
+.range-slider .range-highlight {
+  position: absolute;
+  top: 0; bottom: 0;
+  background: rgba(200,200,200,0.6);
+  pointer-events: none;
+}
+
+.range-slider .handle {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 6px;
+  background: red;
+  cursor: ew-resize;
+}

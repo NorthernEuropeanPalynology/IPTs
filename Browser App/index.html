@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ND2 Segmentation App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+  <script src="https://pages.nist.gov/OpenSeadragonScalebar/openseadragon/openseadragon-scalebar.js"></script>
+  <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
+  <link rel="stylesheet" href="./static/style.css">
+   <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div style="display: flex; flex-direction: row;">Opened File: <div id="file-info">default.dzi</div></div>
+    <div class="header-buttons">
+      <input id="nd2file" type="file" style="display: none;"></input>
+      <button id="openFileBtn" type="button">Create Pyramid</button>
+      <script>
+        document.getElementById("openFileBtn").addEventListener("click", () => {
+          document.getElementById("nd2file").click();  // trigger hidden input
+        });
+      </script>
+      <button id="openFile">Open File</button>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div id="main-container">
+    <!-- Viewer -->
+    <div id="viewer"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div id="tabs">
+        <div class="tab active" data-tab="segmentation">Segmentation</div>
+        <div class="tab" data-tab="morphology">Morphology</div>
+        <div class="tab" data-tab="results">Result Table</div>
+      </div>
+
+      <!-- Segmentation tab -->
+      <div id="segmentation" class="tab-content active">
+        
+        
+        <div id = "ButtonList" style="display: flex; flex-direction: row; gap: 20px">
+          <button id="pipetteBtn" type="button" style="height:50px;width:50px;text-align:center;" title="Sample HSV" aria-label="Sample HSV">
+            <img src="static/images/sample_icon.png" alt="Sample HSV" style="height:100%; width:100%; object-fit:contain;">
+          </button>
+
+          <button id="exportCSV" type="button" style="height:50px;width:50px;text-align:center;" title="Download CSV" aria-label="Download CSV">
+            <img src="static/images/export csv_icon.png" alt="Download CSV" style="height:100%; width:100%; object-fit:contain;">
+          </button>
+
+          <button id="exportPollen" type="button" style="height:50px;width:50px;text-align:center;" title="Export images" aria-label="Export images">
+            <img src="static/images/export image_icon.png" alt="Export images" style="height:100%; width:100%; object-fit:contain;">
+          </button>
+          <script src="./static/code/HSVSampler.js"></script>
+          <script src="./static/code/ExtractSample.js"></script>
+        </div>
+
+        <!-- Row 1: Histograms -->
+        <div class="histograms">
+          <div>
+            <div class="hist-label">Hue:</div>
+            <div id="hue-hist" class="hsv-container">
+              <div id="hue-plot" class="hsv-plot"></div>
+              <div class="range-slider" id="hue-slider">
+                <div class="range-highlight"></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="hist-label">Saturation:</div>
+            <div id="sat-hist" class="hsv-container">
+              <div id="sat-plot" class="sat-plot"></div>
+              <div class="range-slider" id="sat-slider">
+                <div class="range-highlight"></div>
+              </div>
+            </div>
+          </div>
+                  
+          <div>
+            <div class="hist-label">Lightness:</div>
+            <div id="val-hist" class="hsv-container">
+              <div id="val-plot" class="val-plot"></div>
+              <div class="range-slider" id="val-slider">
+                <div class="range-highlight"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Settings -->
+        <div class="settings" style="justify-content: center;">
+          <div>
+
+          </div>
+          <div class="form-row"><label>Minimal distance:</label><input type="number" id="min-distance" value="45" min="0" max="99000" step="1"></div>
+          <div class="form-row"><label>Dilation iterations:</label><input type="number" id="dilate" value="1" min="0" max="5"></div>
+          <div class="form-row"><label>Smoothing radius:</label><input type="number" id="smooth" value="1" min="0" max="100"></div>
+          <div class="form-row"><label>Gaussian sigma: </label><input type="number" id="sigma" step="0.5" value="0.0"></div>
+          <label><input type="checkbox" id="watershed" checked> Apply watershed</label>
+          <label><input type="checkbox" id="do_morphology" checked> Apply morphology filters</label>
+
+        </div>
+
+        <!-- Row 3: Button -->
+        <div class="actions">
+          <button onclick="runSegmentation('PREVIEW')">Preview</button>
+          <button onclick="runSegmentation('PREVIEW')">Keep Updating</button>
+          <button onclick="runSegmentation('COMPLETE')">Run Segmentation</button>
+        </div>
+
+        <script src="./static/code/HSVHistograms.js"></script>
+      </div>   
+
+      <!-- Morphology tab -->
+      <div id="morphology" class="tab-content">
+        <div class="form-row"><label>Min object area:</label><input type="number" id="minarea" value="100" min = "0" max = "999998" step="100"></div>
+        <div class="form-row"><label>Max object area:</label><input type="number" id="maxarea" value="999999" min="1" max="999999" step="100"></div>
+        <br>
+
+        <div class="form-row"><label>Min Circularity:</label><input type="number" id="mincircularity" value="0" min="0" max="1" step="0.01"></div>
+        <div class="form-row"><label>Max Circularity:</label><input type="number" id="maxcircularity" value="1" min="0" max="1" step="0.01"></div>
+        <br>
+
+        <div class="form-row"><label>Min Equalized Diameter:</label><input type="number" id="mineqdiam" value="0" min="0" max="1" step="0.01"></div>
+        <div class="form-row"><label>Max Equalized Diameter:</label><input type="number" id="maxeqdiam" value="1" min="0" max="1" step="0.01"></div>
+        <br>
+
+      </div>
+
+      <!-- Results tab -->
+      <div id="results" class="tab-content">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Area</th>
+              <th>Perimeter</th>
+              <th>Eccentricity</th>
+              <th>Solidity</th>
+              <th>Eq. Diameter</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Loading Overlay (only keep this one) -->
+  <div id="fileModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;"> 
+    <!-- Modal content box --> 
+    <div style="background:white; width:50%; max-height:70%; margin:5% auto; padding:20px; border-radius:8px; overflow-y:auto;"> 
+      <h3>Select a DZI file</h3> 
+      <ul id="fileList" style="list-style:none; padding:0; margin:0"></ul> 
+      <button id="closeModal" style="margin-top:10px;">Close</button> 
+    </div> 
+  </div>
+
+  <!-- Loading Overlay (only keep this one) -->
+  <div id="loadingOverlay">
+    <div class="loading-box">
+      <p>Processing ND2 file...</p>
+      <progress id="progressBar" value="0" max="100"></progress>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./static/code/FetchPyramidView.js"></script>
+  <script src="./static/code/LoadCachedPyramid.js"></script>
+  <script src="./static/code/RunSegmentation.js"></script>
+  <script src="./static/code/TabInteractivity.js"></script>
+  <script src="./static/code/OverlayMask.js"></script>
+</body>
+</html>
